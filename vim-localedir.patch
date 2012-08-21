@@ -1,0 +1,92 @@
+diff -aurN vim73.orig/src/main.c vim73/src/main.c
+--- vim73.orig/src/main.c	2012-08-06 21:19:04.000000000 +0200
++++ vim73/src/main.c	2012-08-06 21:20:51.871223614 +0200
+@@ -1512,23 +1512,10 @@
+ 
+ # ifdef FEAT_GETTEXT
+     {
+-	int	mustfree = FALSE;
+-	char_u	*p;
+-
+ #  ifdef DYNAMIC_GETTEXT
+ 	/* Initialize the gettext library */
+ 	dyn_libintl_init(NULL);
+ #  endif
+-	/* expand_env() doesn't work yet, because chartab[] is not initialized
+-	 * yet, call vim_getenv() directly */
+-	p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
+-	if (p != NULL && *p != NUL)
+-	{
+-	    vim_snprintf((char *)NameBuff, MAXPATHL, "%s/lang", p);
+-	    bindtextdomain(VIMPACKAGE, (char *)NameBuff);
+-	}
+-	if (mustfree)
+-	    vim_free(p);
+ 	textdomain(VIMPACKAGE);
+     }
+ # endif
+diff -aurN vim73.orig/src/Makefile vim73/src/Makefile
+--- vim73.orig/src/Makefile	2012-08-06 21:19:04.000000000 +0200
++++ vim73/src/Makefile	2012-08-06 21:23:27.947793316 +0200
+@@ -1000,6 +1000,7 @@
+ PLUGSUBLOC	= $(VIMRTLOC)$(PLUGSUBDIR)
+ FTPLUGSUBLOC	= $(VIMRTLOC)$(FTPLUGSUBDIR)
+ LANGSUBLOC	= $(VIMRTLOC)$(LANGSUBDIR)
++LOCALESUBLOC	= $(DATADIR)/locale
+ COMPSUBLOC	= $(VIMRTLOC)$(COMPSUBDIR)
+ KMAPSUBLOC	= $(VIMRTLOC)$(KMAPSUBDIR)
+ MACROSUBLOC	= $(VIMRTLOC)$(MACROSUBDIR)
+@@ -1377,6 +1378,7 @@
+ DEST_PLUG = $(DESTDIR)$(PLUGSUBLOC)
+ DEST_FTP = $(DESTDIR)$(FTPLUGSUBLOC)
+ DEST_LANG = $(DESTDIR)$(LANGSUBLOC)
++DEST_LOCALE = $(DESTDIR)$(LOCALESUBLOC)
+ DEST_COMP = $(DESTDIR)$(COMPSUBLOC)
+ DEST_KMAP = $(DESTDIR)$(KMAPSUBLOC)
+ DEST_MACRO = $(DESTDIR)$(MACROSUBLOC)
+@@ -2101,7 +2103,7 @@
+ 	-$(SHELL) ./installml.sh install "$(GUI_MAN_TARGETS)" \
+ 		$(DEST_MAN_RU_U) $(INSTALLMLARGS)
+ 	if test -n "$(MAKEMO)" -a -f $(PODIR)/Makefile; then \
+-	   cd $(PODIR); $(MAKE) prefix=$(DESTDIR)$(prefix) LOCALEDIR=$(DEST_LANG) \
++		cd $(PODIR); $(MAKE) prefix=$(DESTDIR)$(prefix) LOCALEDIR=$(DEST_LOCALE) \
+ 	   INSTALL_DATA=$(INSTALL_DATA) FILEMOD=$(FILEMOD) install; \
+ 	fi
+ 	if test -d $(LANGSOURCE); then \
+diff -aurN vim73.orig/src/misc1.c vim73/src/misc1.c
+--- vim73.orig/src/misc1.c	2012-08-06 21:19:04.000000000 +0200
++++ vim73/src/misc1.c	2012-08-06 21:21:24.521370905 +0200
+@@ -4393,22 +4393,6 @@
+ 	putenv((char *)envbuf);
+     }
+ #endif
+-#ifdef FEAT_GETTEXT
+-    /*
+-     * When setting $VIMRUNTIME adjust the directory to find message
+-     * translations to $VIMRUNTIME/lang.
+-     */
+-    if (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
+-    {
+-	char_u	*buf = concat_str(val, (char_u *)"/lang");
+-
+-	if (buf != NULL)
+-	{
+-	    bindtextdomain(VIMPACKAGE, (char *)buf);
+-	    vim_free(buf);
+-	}
+-    }
+-#endif
+ }
+ 
+ #if defined(FEAT_CMDL_COMPL) || defined(PROTO)
+diff -aurN vim73.orig/src/po/Makefile vim73/src/po/Makefile
+--- vim73.orig/src/po/Makefile	2010-08-07 13:37:24.000000000 +0200
++++ vim73/src/po/Makefile	2012-08-06 21:24:01.940041751 +0200
+@@ -138,6 +138,7 @@
+ 
+ install: $(MOFILES)
+ 	@$(MAKE) prefixcheck
++	install -d $(LOCALEDIR); \
+ 	for lang in $(LANGUAGES); do \
+ 	  dir=$(LOCALEDIR)/$$lang/; \
+ 	  if test ! -x "$$dir"; then \
