@@ -7,7 +7,7 @@
 Summary:	Vi IMproved
 Name:		vim
 Version:	%{ver}.%{patchlevel}
-Release:	1
+Release:	2
 Epoch:		4
 License:	Charityware
 Group:		Applications/Editors/Vim
@@ -81,7 +81,7 @@ using :help command.
 Summary:	Vim tutorial
 Group:		Applications/Editors/Vim
 Requires:	%{name} = %{epoch}:%{version}-%{release}
-Requires:	mktemp
+Requires:	coreutils
 
 %description tutor
 This package contains Vim tutorial.
@@ -119,8 +119,7 @@ output. Moreover, it can be used to perform binary file patching.
 %package rt
 Summary:	Vim runtime files
 Group:		Applications/Editors/Vim
-# mktemp is for vimtutor
-Requires:	mktemp
+Requires:	coreutils
 
 %description rt
 This package contains macros, documentation, syntax configuration and
