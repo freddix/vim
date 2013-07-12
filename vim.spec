@@ -1,5 +1,5 @@
 %define		ver		7.3
-%define		patchlevel	622
+%define		patchlevel	1287
 
 # cflags get changed while configuring
 %undefine	configure_cache
@@ -7,7 +7,7 @@
 Summary:	Vi IMproved
 Name:		vim
 Version:	%{ver}.%{patchlevel}
-Release:	2
+Release:	3
 Epoch:		4
 License:	Charityware
 Group:		Applications/Editors/Vim
@@ -258,6 +258,25 @@ install -d $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/{doc,{after/,}{compiler,ftdet
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+# separate package
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/{ftplugin,syntax}/spec.vim
+
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/vim/tools
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/bugreport.vim
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/spell/check_locales.vim
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/spell/cleanadd.vim
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/spell/fixdup.vim
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/doc/vim2html.pl
+
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/cs.cp1250
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/ja.sjis
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/pl.UTF-8
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/pl.cp1250
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/ru.cp1251
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/sk.cp1250
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/uk.cp1251
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/zh_CN.cp936
+
 %find_lang %{name}
 
 # use compressed docs, see :help gzip-helpfile
@@ -294,16 +313,6 @@ install %{SOURCE21} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/22x22/apps/vim.png
 install %{SOURCE22} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/32x32/apps/vim.png
 install %{SOURCE23} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/48x48/apps/vim.png
 install %{SOURCE30} $RPM_BUILD_ROOT%{_desktopdir}/gvim.desktop
-
-# separate package
-%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/{ftplugin,syntax}/spec.vim
-
-%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/vim/tools
-%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/bugreport.vim
-%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/spell/check_locales.vim
-%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/spell/cleanadd.vim
-%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/spell/fixdup.vim
-%{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/doc/vim2html.pl
 
 %clean
 rm -rf $RPM_BUILD_ROOT

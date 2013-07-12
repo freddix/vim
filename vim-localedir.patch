@@ -1,7 +1,6 @@
-diff -aurN vim73.orig/src/main.c vim73/src/main.c
---- vim73.orig/src/main.c	2012-08-06 21:19:04.000000000 +0200
-+++ vim73/src/main.c	2012-08-06 21:20:51.871223614 +0200
-@@ -1512,23 +1512,10 @@
+--- vim72/src/main.c~	2009-04-15 01:00:47.000000000 +0300
++++ vim72/src/main.c	2009-04-15 01:11:33.555899981 +0300
+@@ -1382,23 +1382,10 @@
  
  # ifdef FEAT_GETTEXT
      {
@@ -25,38 +24,9 @@ diff -aurN vim73.orig/src/main.c vim73/src/main.c
  	textdomain(VIMPACKAGE);
      }
  # endif
-diff -aurN vim73.orig/src/Makefile vim73/src/Makefile
---- vim73.orig/src/Makefile	2012-08-06 21:19:04.000000000 +0200
-+++ vim73/src/Makefile	2012-08-06 21:23:27.947793316 +0200
-@@ -1000,6 +1000,7 @@
- PLUGSUBLOC	= $(VIMRTLOC)$(PLUGSUBDIR)
- FTPLUGSUBLOC	= $(VIMRTLOC)$(FTPLUGSUBDIR)
- LANGSUBLOC	= $(VIMRTLOC)$(LANGSUBDIR)
-+LOCALESUBLOC	= $(DATADIR)/locale
- COMPSUBLOC	= $(VIMRTLOC)$(COMPSUBDIR)
- KMAPSUBLOC	= $(VIMRTLOC)$(KMAPSUBDIR)
- MACROSUBLOC	= $(VIMRTLOC)$(MACROSUBDIR)
-@@ -1377,6 +1378,7 @@
- DEST_PLUG = $(DESTDIR)$(PLUGSUBLOC)
- DEST_FTP = $(DESTDIR)$(FTPLUGSUBLOC)
- DEST_LANG = $(DESTDIR)$(LANGSUBLOC)
-+DEST_LOCALE = $(DESTDIR)$(LOCALESUBLOC)
- DEST_COMP = $(DESTDIR)$(COMPSUBLOC)
- DEST_KMAP = $(DESTDIR)$(KMAPSUBLOC)
- DEST_MACRO = $(DESTDIR)$(MACROSUBLOC)
-@@ -2101,7 +2103,7 @@
- 	-$(SHELL) ./installml.sh install "$(GUI_MAN_TARGETS)" \
- 		$(DEST_MAN_RU_U) $(INSTALLMLARGS)
- 	if test -n "$(MAKEMO)" -a -f $(PODIR)/Makefile; then \
--	   cd $(PODIR); $(MAKE) prefix=$(DESTDIR)$(prefix) LOCALEDIR=$(DEST_LANG) \
-+		cd $(PODIR); $(MAKE) prefix=$(DESTDIR)$(prefix) LOCALEDIR=$(DEST_LOCALE) \
- 	   INSTALL_DATA=$(INSTALL_DATA) FILEMOD=$(FILEMOD) install; \
- 	fi
- 	if test -d $(LANGSOURCE); then \
-diff -aurN vim73.orig/src/misc1.c vim73/src/misc1.c
---- vim73.orig/src/misc1.c	2012-08-06 21:19:04.000000000 +0200
-+++ vim73/src/misc1.c	2012-08-06 21:21:24.521370905 +0200
-@@ -4393,22 +4393,6 @@
+--- vim72/src/misc1.c~	2009-04-15 01:00:48.000000000 +0300
++++ vim72/src/misc1.c	2009-04-15 01:13:00.319209732 +0300
+@@ -4215,22 +4215,6 @@
  	putenv((char *)envbuf);
      }
  #endif
@@ -79,14 +49,40 @@ diff -aurN vim73.orig/src/misc1.c vim73/src/misc1.c
  }
  
  #if defined(FEAT_CMDL_COMPL) || defined(PROTO)
-diff -aurN vim73.orig/src/po/Makefile vim73/src/po/Makefile
---- vim73.orig/src/po/Makefile	2010-08-07 13:37:24.000000000 +0200
-+++ vim73/src/po/Makefile	2012-08-06 21:24:01.940041751 +0200
-@@ -138,6 +138,7 @@
+--- vim72/src/Makefile~	2009-04-15 01:00:48.000000000 +0300
++++ vim72/src/Makefile	2009-04-15 01:19:18.519171979 +0300
+@@ -957,6 +957,7 @@
+ PLUGSUBLOC	= $(VIMRTLOC)$(PLUGSUBDIR)
+ FTPLUGSUBLOC	= $(VIMRTLOC)$(FTPLUGSUBDIR)
+ LANGSUBLOC	= $(VIMRTLOC)$(LANGSUBDIR)
++LOCALESUBLOC	= $(DATADIR)/locale
+ COMPSUBLOC	= $(VIMRTLOC)$(COMPSUBDIR)
+ KMAPSUBLOC	= $(VIMRTLOC)$(KMAPSUBDIR)
+ MACROSUBLOC	= $(VIMRTLOC)$(MACROSUBDIR)
+@@ -1325,6 +1326,7 @@
+ DEST_PLUG = $(DESTDIR)$(PLUGSUBLOC)
+ DEST_FTP = $(DESTDIR)$(FTPLUGSUBLOC)
+ DEST_LANG = $(DESTDIR)$(LANGSUBLOC)
++DEST_LOCALE = $(DESTDIR)$(LOCALESUBLOC)
+ DEST_COMP = $(DESTDIR)$(COMPSUBLOC)
+ DEST_KMAP = $(DESTDIR)$(KMAPSUBLOC)
+ DEST_MACRO = $(DESTDIR)$(MACROSUBLOC)
+@@ -1988,7 +1988,7 @@
+ 	-$(SHELL) ./installml.sh install "$(GUI_MAN_TARGETS)" \
+ 		$(DEST_MAN_RU_U) $(INSTALLMLARGS)
+ 	if test -n "$(MAKEMO)" -a -f $(PODIR)/Makefile; then \
+-	   cd $(PODIR); $(MAKE) prefix=$(DESTDIR)$(prefix) LOCALEDIR=$(DEST_LANG) \
++	   cd $(PODIR); $(MAKE) prefix=$(DESTDIR)$(prefix) LOCALEDIR=$(DEST_LOCALE) \
+ 	   INSTALL_DATA=$(INSTALL_DATA) FILEMOD=$(FILEMOD) install; \
+ 	fi
+ 	if test -d $(LANGSOURCE); then \
+--- vim73/src/po/Makefile~	2013-02-22 17:28:18.000000000 +0200
++++ vim73/src/po/Makefile	2013-02-22 17:46:40.771918175 +0200
+@@ -151,6 +151,7 @@
  
- install: $(MOFILES)
+ install: $(MOFILES) $(MOCONVERTED)
  	@$(MAKE) prefixcheck
 +	install -d $(LOCALEDIR); \
- 	for lang in $(LANGUAGES); do \
+ 	for lang in $(LANGUAGES) $(CONVERTED); do \
  	  dir=$(LOCALEDIR)/$$lang/; \
  	  if test ! -x "$$dir"; then \
