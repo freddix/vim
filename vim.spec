@@ -1,18 +1,19 @@
-%define		ver		7.3
-%define		patchlevel	1287
+%define		ver		7.4
+%define		patchlevel	%{nil}
 
 # cflags get changed while configuring
 %undefine	configure_cache
 
 Summary:	Vi IMproved
 Name:		vim
-Version:	%{ver}.%{patchlevel}
-Release:	3
+Version:	%{ver}%{patchlevel}
+Release:	0.3
 Epoch:		4
 License:	Charityware
 Group:		Applications/Editors/Vim
 Source0:	ftp://ftp.vim.org/pub/vim/unix/%{name}-%{ver}.tar.bz2
-# Source0-md5:	5b9510a17074e2b37d8bb38ae09edbf2
+# Source0-md5:	607e135c559be642f210094ad023dc65
+#
 # tango icons
 Source20:	%{name}-16x16.png
 Source21:	%{name}-22x22.png
@@ -25,8 +26,9 @@ Source41:	%{name}-color-scheme-oceanblack.vim
 Source42:	%{name}-color-scheme-oceandeep.vim
 Source43:	%{name}-color-scheme-zenburn.vim
 Source44:	%{name}-color-scheme-moria.vim
+#
 # patchset
-Source100:	%{name}-%{ver}.%{patchlevel}.patch.xz
+#Source100:	%{name}-%{ver}.%{patchlevel}.patch.xz
 #
 Patch0:		%{name}-sysconfdir.patch
 Patch1:		%{name}-visual.patch
@@ -34,23 +36,11 @@ Patch2:		%{name}-paths.patch
 Patch3:		%{name}-no_libelf.patch
 Patch4:		%{name}-egrep.patch
 Patch5:		%{name}-awk.patch
-Patch6:		%{name}-filetype_vim-perl_tests.patch
-Patch7:		%{name}-po-syntax.patch
-Patch8:		%{name}-modprobe.patch
-Patch9:		%{name}-rtdir.patch
-Patch10:	%{name}-doubleparenthesis.patch
-Patch11:	%{name}-syntax-fstab.patch
-Patch12:	%{name}-vixie.patch
-Patch13:	%{name}-cron-vars.patch
-Patch14:	%{name}-fstab-tmpfs-size.patch
-Patch15:	%{name}-fstab-bogus-errors.patch
-Patch16:	%{name}-bash-completion.patch
-Patch17:	%{name}-automake-substitutions.patch
-Patch18:	%{name}-smarty.patch
-Patch19:	%{name}-filetypes.patch
-Patch20:	%{name}-man_installation.patch
-Patch21:	%{name}-locales.patch
-Patch22:	%{name}-localedir.patch
+Patch6:		%{name}-rtdir.patch
+Patch7:		%{name}-doubleparenthesis.patch
+Patch8:		%{name}-locales.patch
+Patch9:		%{name}-localedir.patch
+Patch10:	%{name}-installman.patch
 URL:		http://www.vim.org/
 BuildRequires:	autoconf
 BuildRequires:	gettext-devel
@@ -60,7 +50,7 @@ BuildRequires:	unzip
 Requires:	%{name}-rt = %{epoch}:%{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-# that's example script
+# example script
 %define		_noautoreq	'/bin/csh'
 
 %description
@@ -89,8 +79,8 @@ This package contains Vim tutorial.
 %package -n gvim
 Summary:	Vim with Gtk+ GUI
 Group:		Applications/Editors/Vim
+Requires(post,postun):	/usr/bin/gtk-update-icon-cache
 Requires(post,postun):	desktop-file-utils
-Requires(post,postun):	gtk+
 Requires:	%{name}-rt = %{epoch}:%{version}-%{release}
 Requires:	iconv
 
@@ -127,9 +117,11 @@ manual pages for Vim. If you want to take advantage of Vim more
 powerful features, you should install this package.
 
 %prep
-%setup -q -n %{name}73
+%setup -qn %{name}74
 
+%if "%{patchlevel}" != "%{nil}"
 xz -dc %{SOURCE100} | patch -p0
+%endif
 
 %patch0 -p1
 %patch1 -p1
@@ -139,22 +131,11 @@ xz -dc %{SOURCE100} | patch -p0
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-%patch8 -p0
+%patch8 -p1
 %patch9 -p1
 %patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p0
-%patch17 -p0
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
 
+# themes
 install %{SOURCE40} runtime/colors/borland.vim
 install %{SOURCE41} runtime/colors/oceanblack.vim
 install %{SOURCE42} runtime/colors/oceandeep.vim
@@ -162,17 +143,17 @@ install %{SOURCE43} runtime/colors/zenburn.vim
 install %{SOURCE44} runtime/colors/moria.vim
 
 # remove unsupported locales
-rm -f src/po/zh_{CN,TW}.UTF-8.po
-rm -f runtime/lang/menu_zh_{cn,tw}.utf-8.vim
+%{__rm} src/po/zh_{CN,TW}.UTF-8.po
+%{__rm} runtime/lang/menu_zh_{cn,tw}.utf-8.vim
 
 # fix nb/no
-mv -f src/po/n{o,b}.po
-mv -f runtime/tutor/tutor.n{o,b}
-mv -f runtime/tutor/tutor.n{o,b}.utf-8
-mv -f runtime/lang/menu_n{o,b}.latin1.vim
-mv -f runtime/lang/menu_n{o,b}.utf-8.vim
-mv -f runtime/lang/menu_n{o,b}_no.latin1.vim
-mv -f runtime/lang/menu_n{o,b}_no.utf-8.vim
+%{__mv} src/po/n{o,b}.po
+%{__mv} runtime/tutor/tutor.n{o,b}
+%{__mv} runtime/tutor/tutor.n{o,b}.utf-8
+%{__mv} runtime/lang/menu_n{o,b}.latin1.vim
+%{__mv} runtime/lang/menu_n{o,b}.utf-8.vim
+%{__mv} runtime/lang/menu_n{o,b}_no.latin1.vim
+%{__mv} runtime/lang/menu_n{o,b}_no.utf-8.vim
 
 %build
 cd src
@@ -243,13 +224,14 @@ mv vim bin/gvim
 	--without-x
 %{__make} vim
 
+# xxd
 %{__make} xxd/xxd languages
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT{%{_sysconfdir}/vim,%{_bindir}} \
-	$RPM_BUILD_ROOT{/bin,%{_mandir}/man1,%{_datadir}/vim/ftdetect} \
+	$RPM_BUILD_ROOT{%{_mandir}/man1,%{_datadir}/vim/ftdetect} \
 	$RPM_BUILD_ROOT%{_desktopdir} \
 	$RPM_BUILD_ROOT%{_iconsdir}/hicolor/{16x16/apps,22x22/apps,32x32/apps,48x48/apps}
 
@@ -258,9 +240,10 @@ install -d $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/{doc,{after/,}{compiler,ftdet
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-# separate package
+# vim-syntax-spec package
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/{ftplugin,syntax}/spec.vim
 
+# cleanup
 %{__rm} -r $RPM_BUILD_ROOT%{_datadir}/vim/tools
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/bugreport.vim
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/spell/check_locales.vim
@@ -269,6 +252,7 @@ install -d $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/{doc,{after/,}{compiler,ftdet
 %{__rm} $RPM_BUILD_ROOT%{_datadir}/vim/doc/vim2html.pl
 
 %{__rm} -r $RPM_BUILD_ROOT%{_localedir}/cs.cp1250
+%{__rm} -r $RPM_BUILD_ROOT%{_localedir}/ja.euc-jp
 %{__rm} -r $RPM_BUILD_ROOT%{_localedir}/ja.sjis
 %{__rm} -r $RPM_BUILD_ROOT%{_localedir}/pl.UTF-8
 %{__rm} -r $RPM_BUILD_ROOT%{_localedir}/pl.cp1250
@@ -283,8 +267,6 @@ install -d $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/{doc,{after/,}{compiler,ftdet
 %{__gzip} -9 $RPM_BUILD_ROOT%{_datadir}/vim/doc/*.txt
 %{__sed} -i -e 's=\(\t.*\.txt\)\t=\1.gz\t=' $RPM_BUILD_ROOT%{_datadir}/vim/doc/tags
 
-%{__rm} $RPM_BUILD_ROOT%{_bindir}/*
-
 install -p src/bin/gvim $RPM_BUILD_ROOT%{_bindir}/gvim
 install -p src/bin/vi $RPM_BUILD_ROOT%{_bindir}/vi
 install -p src/vim $RPM_BUILD_ROOT%{_bindir}/vim
@@ -292,26 +274,21 @@ install -p src/vimtutor $RPM_BUILD_ROOT%{_bindir}/vimtutor
 install -p src/xxd/xxd $RPM_BUILD_ROOT%{_bindir}/xxd
 
 # not supported directories
-%{__rm} -r $RPM_BUILD_ROOT%{_mandir}/??.*/
+#%{__rm} -r $RPM_BUILD_ROOT%{_mandir}/??.*/
 
+# default configuration
 mv -f $RPM_BUILD_ROOT{%{_datadir}/vim/gvimrc_example.vim,%{_sysconfdir}/vim/gvimrc}
+mv -f $RPM_BUILD_ROOT{%{_datadir}/vim/vimrc_example.vim,%{_sysconfdir}/vim/vimrc}
 
-ln -sf gvim $RPM_BUILD_ROOT%{_bindir}/evim
 ln -sf gvim $RPM_BUILD_ROOT%{_bindir}/gvimdiff
-ln -sf vi  $RPM_BUILD_ROOT%{_bindir}/ex
-ln -sf vi  $RPM_BUILD_ROOT%{_bindir}/rview
-ln -sf vi  $RPM_BUILD_ROOT%{_bindir}/view
-ln -sf vim $RPM_BUILD_ROOT%{_bindir}/rvim
-ln -sf vim $RPM_BUILD_ROOT%{_bindir}/vimdiff
 
 > $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/doc/tags
 
-mv -f $RPM_BUILD_ROOT{%{_datadir}/vim/vimrc_example.vim,%{_sysconfdir}/vim/vimrc}
-
-install %{SOURCE20} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/16x16/apps/vim.png
-install %{SOURCE21} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/22x22/apps/vim.png
-install %{SOURCE22} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/32x32/apps/vim.png
-install %{SOURCE23} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/48x48/apps/vim.png
+# for GVim
+install %{SOURCE20} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/16x16/apps/gvim.png
+install %{SOURCE21} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/22x22/apps/gvim.png
+install %{SOURCE22} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/32x32/apps/gvim.png
+install %{SOURCE23} $RPM_BUILD_ROOT%{_iconsdir}/hicolor/48x48/apps/gvim.png
 install %{SOURCE30} $RPM_BUILD_ROOT%{_desktopdir}/gvim.desktop
 
 %clean
@@ -338,24 +315,19 @@ rm -rf $RPM_BUILD_ROOT
 %lang(fr) %{_mandir}/fr/man1/vimdiff.1.*
 %lang(it) %{_mandir}/it/man1/vim.1.*
 %lang(it) %{_mandir}/it/man1/vimdiff.1.*
+%lang(ja) %{_mandir}/ja/man1/vim.1*
+%lang(ja) %{_mandir}/ja/man1/vimdiff.1*
 %lang(pl) %{_mandir}/pl/man1/rview.1*
 %lang(pl) %{_mandir}/pl/man1/view.1*
+%lang(pl) %{_mandir}/pl/man1/vim.1*
 %lang(pl) %{_mandir}/pl/man1/vimdiff.1*
-%lang(ru) %{_mandir}/ru/man1/vim.1.*
-%lang(ru) %{_mandir}/ru/man1/vimdiff.1.*
 
 %files -n gvim
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/evim
 %attr(755,root,root) %{_bindir}/gvim
 %attr(755,root,root) %{_bindir}/gvimdiff
 %{_desktopdir}/gvim.desktop
-%{_iconsdir}/hicolor/*/apps/vim.png
-%{_mandir}/man1/evim.1*
-%{_mandir}/fr/man1/evim.1*
-%{_mandir}/pl/man1/evim.1*
-%{_mandir}/ru/man1/evim.1*
-%{_mandir}/it/man1/evim.1*
+%{_iconsdir}/hicolor/*/apps/gvim.png
 
 %files static
 %defattr(644,root,root,755)
@@ -379,7 +351,6 @@ rm -rf $RPM_BUILD_ROOT
 %lang(fr) %{_mandir}/fr/man1/xxd.1*
 %lang(it) %{_mandir}/it/man1/xxd.1*
 %lang(pl) %{_mandir}/pl/man1/xxd.1*
-%lang(ru) %{_mandir}/ru/man1/xxd.1*
 
 %files rt -f %{name}.lang
 %defattr(644,root,root,755)
@@ -480,6 +451,8 @@ rm -rf $RPM_BUILD_ROOT
 %lang(zh_TW) %{_datadir}/vim/lang/menu_*taiwan*
 
 %dir %{_datadir}/vim/spell
+%{_datadir}/vim/spell/en.*
+%{_datadir}/vim/spell/spell.vim
 %lang(he) %{_datadir}/vim/spell/he.*
 %lang(yi) %{_datadir}/vim/spell/yi.*
 
@@ -502,8 +475,6 @@ rm -rf $RPM_BUILD_ROOT
 %lang(el) %{_datadir}/vim/tutor/README.el.cp737.txt
 %lang(el) %{_datadir}/vim/tutor/README.el.txt
 
-%lang(bj) %{_datadir}/vim/tutor/tutor.bj
-%lang(bj) %{_datadir}/vim/tutor/tutor.bj.utf-8
 %lang(ca) %{_datadir}/vim/tutor/tutor.ca
 %lang(ca) %{_datadir}/vim/tutor/tutor.ca.utf-8
 %lang(cs) %{_datadir}/vim/tutor/tutor.cs
@@ -558,6 +529,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/vimtutor.1*
 %lang(fr) %{_mandir}/fr/man1/vimtutor.1*
 %lang(it) %{_mandir}/it/man1/vimtutor.1*
+%lang(ja) %{_mandir}/ja/man1/vimtutor.1*
 %lang(pl) %{_mandir}/pl/man1/vimtutor.1*
-%lang(ru) %{_mandir}/ru/man1/vimtutor.1*
 
