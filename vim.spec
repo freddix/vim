@@ -1,5 +1,5 @@
 %define		ver		7.4
-%define		patchlevel	%{nil}
+%define		patchlevel	005
 
 # cflags get changed while configuring
 %undefine	configure_cache
@@ -28,7 +28,7 @@ Source43:	%{name}-color-scheme-zenburn.vim
 Source44:	%{name}-color-scheme-moria.vim
 #
 # patchset
-#Source100:	%{name}-%{ver}.%{patchlevel}.patch.xz
+Source100:	%{name}-%{ver}.%{patchlevel}.patch.gz
 #
 Patch0:		%{name}-sysconfdir.patch
 Patch1:		%{name}-visual.patch
