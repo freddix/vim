@@ -1,14 +1,14 @@
 %define		ver		7.4
-%define		patchlevel	005
+%define		patchlevel	052
 
 # cflags get changed while configuring
 %undefine	configure_cache
 
 Summary:	Vi IMproved
 Name:		vim
-Version:	%{ver}%{patchlevel}
-Release:	0.3
-Epoch:		4
+Version:	%{ver}.%{patchlevel}
+Release:	1
+Epoch:		5
 License:	Charityware
 Group:		Applications/Editors/Vim
 Source0:	ftp://ftp.vim.org/pub/vim/unix/%{name}-%{ver}.tar.bz2
