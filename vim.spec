@@ -1,5 +1,6 @@
+# based on PLD Linux spec git://git.pld-linux.org/packages/.git
 %define		ver		7.4
-%define		patchlevel	052
+%define		patchlevel	461
 
 # cflags get changed while configuring
 %undefine	configure_cache
@@ -27,8 +28,7 @@ Source42:	%{name}-color-scheme-oceandeep.vim
 Source43:	%{name}-color-scheme-zenburn.vim
 Source44:	%{name}-color-scheme-moria.vim
 #
-# patchset
-Source100:	%{name}-%{ver}.%{patchlevel}.patch.gz
+%patchset_source -f ftp://ftp.vim.org/pub/editors/vim/patches/%{ver}/%{ver}.%03g 1 %{patchlevel}
 #
 Patch0:		%{name}-sysconfdir.patch
 Patch1:		%{name}-visual.patch
@@ -45,7 +45,6 @@ URL:		http://www.vim.org/
 BuildRequires:	autoconf
 BuildRequires:	gettext-devel
 BuildRequires:	gpm-devel
-BuildRequires:	ncurses-static
 BuildRequires:	unzip
 Requires:	%{name}-rt = %{epoch}:%{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -87,13 +86,14 @@ Requires:	iconv
 %description -n gvim
 Vim with Gtk+ GUI.
 
-%package static
-Summary:	Statically linked Vim
+%package minimal
+Summary:	Minimal Vim
 Group:		Applications/Editors/Vim
 Provides:	vi
+Obsoletes:	vim-static
 
-%description static
-Static Vim version with basic features.
+%description minimal
+Minimal Vim version with basic features.
 
 %package -n xxd
 Summary:	Utility to convert files to hexdump or do the reverse
@@ -120,7 +120,7 @@ powerful features, you should install this package.
 %setup -qn %{name}74
 
 %if "%{patchlevel}" != "%{nil}"
-xz -dc %{SOURCE100} | patch -p0
+%patchset_patch 1 %{patchlevel}
 %endif
 
 %patch0 -p1
@@ -163,7 +163,6 @@ cp -f configure auto
 install -d bin
 
 # vi
-LDFLAGS="%{rpmldflags} -static"
 %configure \
 	--disable-cscope		\
 	--disable-gpm			\
@@ -329,7 +328,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_desktopdir}/gvim.desktop
 %{_iconsdir}/hicolor/*/apps/gvim.png
 
-%files static
+%files minimal
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/ex
 %attr(755,root,root) %{_bindir}/vi
